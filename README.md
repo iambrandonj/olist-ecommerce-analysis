@@ -29,7 +29,7 @@ Dashboard interactivo con análisis completo del marketplace brasileño Olist.
 ## Estructura del proyecto
 ```
 Olist/
-├── data/                      # Dataset de Olist (no incluido)
+├── data/                      # Dataset de Olist
 ├── olist_analisis.ipynb       # Análisis exploratorio completo
 ├── olist_app.py               # Dashboard Streamlit
 ├── requirements.txt           # Dependencias del proyecto
@@ -39,12 +39,11 @@ Olist/
 ## ¿Cómo correr el proyecto?
 
 1. Cloná el repositorio
-2. Descargá el dataset desde [Kaggle](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) y colocalo en la carpeta `data/`
-3. Instalá las dependencias
+2. Instalá las dependencias
 ```bash
 pip install -r requirements.txt
 ```
-4. Corré el dashboard
+3. Corré el dashboard
 ```bash
 streamlit run olist_app.py
 ```
