@@ -2,6 +2,8 @@
 
 Dashboard interactivo con análisis completo del marketplace brasileño Olist.
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://olist-ecommerce-analysis-4twcutxpzkujopvnuqlvxz.streamlit.app/)
+
 ## ¿Qué incluye este proyecto?
 
 - Evolución de ventas 2016-2018 con comparación YoY
