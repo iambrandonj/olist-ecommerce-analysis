@@ -27,12 +27,14 @@ Dashboard interactivo con análisis completo del marketplace brasileño Olist.
 - Streamlit — dashboard web
 
 ## Estructura del proyecto
+```
 Olist/
 ├── data/                      # Dataset de Olist (no incluido)
 ├── olist_analisis.ipynb       # Análisis exploratorio completo
 ├── olist_app.py               # Dashboard Streamlit
 ├── requirements.txt           # Dependencias del proyecto
 └── README.md                  # Este archivo
+```
 
 ## ¿Cómo correr el proyecto?
 
