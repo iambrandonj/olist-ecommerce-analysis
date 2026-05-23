@@ -1,0 +1,15 @@
+# Datos
+data/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# Entornos
+.env
+*.egg-info/
+
+# VS Code
+.vscode/
