@@ -1,5 +1,9 @@
 # Datos
-data/
+# NOTA: el dashboard necesita los CSV en el repo porque Streamlit Cloud
+# los lee directo del repositorio (no hay API/DB externa).
+# Solo excluimos el dataset de geolocalización: no lo usa ni el dashboard
+# ni ningún análisis del notebook, y pesa ~59 MB (casi la mitad del repo).
+data/olist_geolocation_dataset.csv
 
 # Python
 __pycache__/

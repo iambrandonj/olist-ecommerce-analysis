@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 import plotly.express as px
 
 # ─────────────────────────────────────────
@@ -203,6 +201,9 @@ rfm = df_rfm.groupby('customer_id').agg(
     monto      = ('payment_value', 'sum')
 ).reset_index()
 
+# Nota: no usamos Frecuencia (F) porque en este dataset el 100% de los
+# clientes compró una sola vez -> F es constante (siempre 1) y no aporta
+# nada para segmentar. Por eso el modelo se reduce a R y M.
 rfm['R_score'] = pd.qcut(rfm['recencia'], q=4, labels=[4, 3, 2, 1]).astype(int)
 rfm['M_score'] = pd.qcut(rfm['monto'].rank(method='first'), q=4, labels=[1, 2, 3, 4]).astype(int)
 
@@ -236,6 +237,70 @@ with col_f:
                   color='segmento',
                   color_discrete_sequence=px.colors.qualitative.Set2)
     st.plotly_chart(fig8, use_container_width=True)
+
+st.divider()
+
+# ─────────────────────────────────────────
+# SECCIÓN 6 — PERFORMANCE DE VENDEDORES (CUADRANTES)
+# ─────────────────────────────────────────
+st.subheader("🏪 Performance de Vendedores por Cuadrantes")
+
+df_sellers = orders[['order_id']].merge(
+    order_items[['order_id', 'seller_id', 'price']], on='order_id'
+)
+df_sellers = df_sellers.merge(reviews[['order_id', 'review_score']], on='order_id', how='left')
+
+seller_metrics = df_sellers.groupby('seller_id').agg(
+    total_ventas   = ('order_id', 'count'),
+    ingresos       = ('price', 'sum'),
+    score_promedio = ('review_score', 'mean')
+).round(2).reset_index()
+
+# Solo vendedores con 10+ ventas, para que el score promedio sea representativo
+seller_metrics = seller_metrics[seller_metrics['total_ventas'] >= 10].copy()
+
+ingresos_mediana = seller_metrics['ingresos'].median()
+score_mediana    = seller_metrics['score_promedio'].median()
+
+def clasificar_vendedor(row):
+    alto_ingreso = row['ingresos'] >= ingresos_mediana
+    alto_score   = row['score_promedio'] >= score_mediana
+    if alto_ingreso and alto_score:
+        return 'Estrellas'
+    elif alto_ingreso and not alto_score:
+        return 'Riesgo reputacional'
+    elif not alto_ingreso and alto_score:
+        return 'Consistentes'
+    else:
+        return 'Bajo rendimiento'
+
+seller_metrics['segmento'] = seller_metrics.apply(clasificar_vendedor, axis=1)
+
+col_g, col_h = st.columns([2, 1])
+
+with col_g:
+    fig9 = px.scatter(
+        seller_metrics, x='ingresos', y='score_promedio',
+        color='segmento', size='total_ventas',
+        hover_data=['seller_id', 'total_ventas'],
+        title=f'Ingresos vs. Satisfacción por vendedor (mín. 10 ventas, n={len(seller_metrics):,})',
+        labels={'ingresos': 'Ingresos totales (BRL)', 'score_promedio': 'Score promedio'},
+        color_discrete_map={
+            'Estrellas': '#4CAF50',
+            'Riesgo reputacional': '#F44336',
+            'Consistentes': '#2196F3',
+            'Bajo rendimiento': '#9E9E9E'
+        }
+    )
+    fig9.add_vline(x=ingresos_mediana, line_dash='dash', line_color='gray')
+    fig9.add_hline(y=score_mediana, line_dash='dash', line_color='gray')
+    st.plotly_chart(fig9, use_container_width=True)
+
+with col_h:
+    st.caption("Distribución por segmento")
+    resumen_segmento = (seller_metrics['segmento'].value_counts(normalize=True) * 100).round(1)
+    for seg in ['Estrellas', 'Riesgo reputacional', 'Consistentes', 'Bajo rendimiento']:
+        st.metric(seg, f"{resumen_segmento.get(seg, 0)}%")
 
 st.divider()
 st.caption("Dashboard desarrollado con Python y Streamlit | Datos: Olist Brazilian E-Commerce Dataset")
